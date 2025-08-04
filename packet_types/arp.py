@@ -1,3 +1,4 @@
+
 from scapy.all import (
     Ether,
     ARP,
@@ -6,6 +7,7 @@ from scapy.all import (
     get_if_hwaddr,
     get_if_addr,
 )
+
 import re
 
 from .helpers import requires, add_vlan, validate_cos, logger

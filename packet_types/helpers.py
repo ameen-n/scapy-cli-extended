@@ -1,9 +1,11 @@
+
 import sys
 import logging
 import codecs
 import socket
 
 from scapy.all import Dot1Q, Ether, NoPayload
+
 
 class MyFormatter(logging.Formatter):
     err_fmt = "%(asctime)s: %(levelname)s: %(message)s, at line %(lineno)d, in %(funcName)s()"
@@ -136,7 +138,6 @@ def validate_cos(cos, vlans):
         else:
             return cos
 
-
 def convert_multicast_ip_to_mac(ip_address):
     try:
         ip_binary = socket.inet_pton(socket.AF_INET, ip_address)
@@ -149,3 +150,4 @@ def convert_multicast_ip_to_mac(ip_address):
     final_string = '{0:012x}'.format(int(mac_bit_string, 2))
     mac_string = ':'.join('%02x' % b for b in (codecs.decode(final_string, 'hex')))
     return mac_string.lower()
+

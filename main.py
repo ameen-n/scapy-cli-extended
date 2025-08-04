@@ -14,6 +14,7 @@ from packet_types.helpers import logger
 def print_menu():
     print("1 -- ICMP")
     print("2 -- ARP")
+
     print("3 -- IGMP")
     print("4 -- Multicast")
     print("5 -- VXLAN")
@@ -23,12 +24,14 @@ def print_menu():
     print("9 -- Quit")
 
 
+
 def call_module(choice):
     if choice == 1:
         build_icmp()
     elif choice == 2:
         build_arp()
     elif choice == 3:
+
         igmp()
     elif choice == 4:
         build_mcast()
@@ -47,8 +50,10 @@ def call_module(choice):
         logger.info('Invalid input. Please select a number (1-9)')
 
 
+
 if __name__ == "__main__":
     call_mod = None
+
     while call_mod != 9:
         print_menu()
         try:
@@ -56,3 +61,4 @@ if __name__ == "__main__":
             call_module(call_mod)
         except ValueError:
             logger.info('Invalid input. Please select a number (1-9)')
+

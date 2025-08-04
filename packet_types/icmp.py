@@ -1,3 +1,4 @@
+
 from scapy.all import (
     Ether,
     IP,
@@ -8,6 +9,7 @@ from scapy.all import (
     get_if_hwaddr,
     get_if_addr,
 )
+
 from os import urandom
 from random import randint
 import re
