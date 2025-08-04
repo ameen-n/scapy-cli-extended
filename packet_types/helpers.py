@@ -1,6 +1,11 @@
-from scapy.all import Dot1Q, Ether, NoPayload
+
 import sys
 import logging
+import codecs
+import socket
+
+from scapy.all import Dot1Q, Ether, NoPayload
+
 
 class MyFormatter(logging.Formatter):
     err_fmt = "%(asctime)s: %(levelname)s: %(message)s, at line %(lineno)d, in %(funcName)s()"
@@ -132,3 +137,17 @@ def validate_cos(cos, vlans):
             return None
         else:
             return cos
+
+def convert_multicast_ip_to_mac(ip_address):
+    try:
+        ip_binary = socket.inet_pton(socket.AF_INET, ip_address)
+        ip_bit_string = ''.join(['{0:08b}'.format(x) for x in ip_binary])
+    except socket.error:
+        raise RuntimeError('Invalid IP Address to convert.')
+    lower_order_23 = ip_bit_string[-23:]
+    high_order_25 = '0000000100000000010111100'
+    mac_bit_string = high_order_25 + lower_order_23
+    final_string = '{0:012x}'.format(int(mac_bit_string, 2))
+    mac_string = ':'.join('%02x' % b for b in (codecs.decode(final_string, 'hex')))
+    return mac_string.lower()
+

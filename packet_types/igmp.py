@@ -1,0 +1,80 @@
+from scapy.all import (
+    Ether,
+    IP,
+    IGMP,
+    get_if_hwaddr,
+    get_if_addr,
+)
+from .helpers import requires, add_vlan, validate_cos, logger
+
+
+def build_igmp():
+    input_param, common_param = requires("IGMP")
+    igmp_pkt = None
+    fuzzy = (input("Random IGMP Packet? (y/n) > ").strip()).lower()
+    if fuzzy == "y":
+        inputs = []
+        for i in range(0, len(common_param)):
+            inputs.insert(i, input("{} > ".format(common_param[i])))
+        src_mac = get_if_hwaddr(inputs[1])
+        src_ip = get_if_addr(inputs[1])
+        igmp_pkt = Ether(src=src_mac) / IP(src=src_ip) / IGMP(
+            type=0x16, gaddr="224.0.0.1")
+        if igmp_pkt != None:
+            logger.info("IGMP packet built")
+            igmp_pkt.show()
+            return igmp_pkt, inputs[0], inputs[1]
+        else:
+            return None
+    elif fuzzy == "n":
+        inputs = []
+        dot1q_prio = []
+        for i in range(0, len(input_param)):
+            temp_input = input("{} > ".format(input_param[i]))
+            if "Tag" in input_param[i] and temp_input.lower() == "y":
+                inputs.insert(i, input("VLAN Tag (x,y) > "))
+                dot1q_prio.insert(0, input("CoS (x,y | default 0) > "))
+            elif "Tag" in input_param[i] and temp_input.lower() == "n":
+                inputs.insert(i, False)
+            elif "Tag" not in input_param[i]:
+                inputs.insert(i, temp_input)
+            else:
+                logger.critical(
+                    "Invalid choice, got '{}' expected values (y/n)".format(
+                        temp_input))
+                return None
+        for j in range(0, len(common_param)):
+            i = i + 1
+            inputs.insert(i, input("{} > ".format(common_param[j])))
+        igmp_pkt = Ether(src=inputs[0]) / IP(src=inputs[1]) / IGMP(
+            type=0x16, gaddr=inputs[2])
+        if inputs[4]:
+            vlans = (inputs[4]).strip().split(",")
+            cos = (dot1q_prio[0]).strip().split(",")
+            try:
+                vlans = [int(i) for i in vlans]
+            except ValueError:
+                logger.critical(
+                    "Invalid vlan id'{}' Expected integer".format(vlans))
+                logger.critical(ValueError, exc_info=True)
+                return None
+            cos = validate_cos(cos, vlans)
+            if igmp_pkt != None and cos != None:
+                igmp_pkt = add_vlan(igmp_pkt, vlans, cos)
+            else:
+                return None
+        if igmp_pkt != None:
+            logger.info("IGMP packet built")
+            igmp_pkt.show()
+            return igmp_pkt, inputs[5], inputs[6]
+        else:
+            return None
+    else:
+        logger.critical(
+            "Invalid input '{}' Expected string (y/n)".format(fuzzy))
+        return None
+
+
+def igmp():
+    return build_igmp()
+

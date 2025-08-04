@@ -1,4 +1,15 @@
-from scapy.all import Ether, IP, ICMP, RandMAC, RandIP, get_if_hwaddr, get_if_addr
+
+from scapy.all import (
+    Ether,
+    IP,
+    ICMP,
+    RandMAC,
+    RandIP,
+    Raw,
+    get_if_hwaddr,
+    get_if_addr,
+)
+
 from os import urandom
 from random import randint
 import re
